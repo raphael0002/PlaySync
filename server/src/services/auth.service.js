@@ -24,6 +24,7 @@ const signup = async (data) => {
       email,
       password: hashedPassword,
       name,
+      role:role
     },
     select: {
       id: true,
