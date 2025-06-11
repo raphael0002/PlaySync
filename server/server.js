@@ -9,5 +9,5 @@ setTimeout(() => {
   app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
-}, 200); // 200ms delay
+}, 200); // 200ms delay for restarting the debugger without config issues
 

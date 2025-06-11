@@ -1,4 +1,4 @@
-import {z} from 'zod';
+import { z } from 'zod';
 
 // Signup validation schema
 const signupSchema = z.object({
@@ -9,6 +9,12 @@ const signupSchema = z.object({
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number'),
   name: z.string().min(2, 'Name must be at least 2 characters').optional(),
+  role: z.string() // normalize the input to uppercase and validate against allowed roles
+    .min(1, 'Role is required')
+    .transform((val) => val.toUpperCase())
+    .refine((val) => ['ADMIN','USER','VENDOR'].includes(val), {
+      message: 'Role must be either ADMIN or USER',
+    }),
 });
 
 // Login validation schema
@@ -23,7 +29,7 @@ const validate = (schema) => (req, res, next) => {
     schema.parse(req.body);
     next();
   } catch (error) {
-    
+
     const errors = error.errors.map(err => ({ //errors inside error is an array of objects of error messages
       field: err,
       message: err.message,
@@ -36,4 +42,4 @@ const validate = (schema) => (req, res, next) => {
   }
 };
 
-export {signupSchema,loginSchema,validate}
+export { signupSchema, loginSchema, validate }
