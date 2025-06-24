@@ -1,18 +1,21 @@
 import prisma from "../config/db.js";
-import { hashPassword, comparePassword, generateToken } from "../utils/auth.utils.js";
-import { NotFoundError, BadRequestError } from "../utils/error.utils.js";
+import {
+  hashPassword,
+  comparePassword,
+  generateToken,
+} from "../utils/auth.utils.js";
+import { BadRequestError } from "../utils/error.utils.js";
 
 const signup = async (data) => {
-
   const { email, password, name, role } = data;
-  
+
   // Check if user already exists
   const existingUser = await prisma.user.findUnique({
-    where: { email }
+    where: { email },
   });
 
   if (existingUser) {
-    throw new BadRequestError('Email already in use');
+    throw new BadRequestError("Email already in use");
   }
 
   // Hash password
@@ -24,12 +27,13 @@ const signup = async (data) => {
       email,
       password: hashedPassword,
       name,
-      role:role
+      role,
     },
     select: {
       id: true,
       email: true,
       name: true,
+      role: true,
       createdAt: true,
     },
   });
@@ -47,14 +51,17 @@ const login = async ({ email, password }) => {
   });
 
   if (!user) {
-    throw new BadRequestError('Invalid credentials');
+    throw new BadRequestError("Invalid credentials");
   }
 
   // Compare passwords
-  const isPasswordValid = await comparePassword(password, user.password);
+  const isPasswordValid = await comparePassword(
+    password,
+    user.password
+  );
 
   if (!isPasswordValid) {
-    throw new BadRequestError('Invalid credentials');
+    throw new BadRequestError("Invalid credentials");
   }
 
   // Generate token
@@ -65,10 +72,11 @@ const login = async ({ email, password }) => {
     id: user.id,
     email: user.email,
     name: user.name,
+    role: user.role,
     createdAt: user.createdAt,
   };
 
   return { user: userData, token };
 };
 
-export {signup, login};
+export { signup, login };
