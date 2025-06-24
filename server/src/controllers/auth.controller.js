@@ -4,12 +4,12 @@ import ApiResponse from '../utils/api-response.js';
 
 const signUp = async (req, res) => {
 
-  const user = await authService.signup(req.body);
+  const users = await authService.signup(req.body);
 
   ApiResponse.send(res, {
     code: StatusCodes.CREATED,
     message: 'User registered successfully',
-    data: { user },
+    data: { users },
   });
 };
 

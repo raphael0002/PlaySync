@@ -13,7 +13,7 @@ const signupSchema = z.object({
     .min(1, 'Role is required')
     .transform((val) => val.toUpperCase())
     .refine((val) => ['ADMIN','USER','VENDOR'].includes(val), {
-      message: 'Role must be either ADMIN or USER',
+      message: 'Role must be either ADMIN or USER or VENDOR',
     }),
 });
 
@@ -26,7 +26,8 @@ const loginSchema = z.object({
 // Validation middleware adapter
 const validate = (schema) => (req, res, next) => {
   try {
-    schema.parse(req.body);
+    const parsed = schema.parse(req.body);
+    req.body = parsed; // If validation passes, replace req.body with the parsed data
     next();
   } catch (error) {
 
