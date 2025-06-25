@@ -27,7 +27,7 @@ const signup = async (data) => {
       email,
       password: hashedPassword,
       name,
-      role,
+      role: role
     },
     select: {
       id: true,
@@ -37,6 +37,28 @@ const signup = async (data) => {
       createdAt: true,
     },
   });
+
+  // Conditionally create Vendor or Admin profile
+  try {
+    if (role === 'VENDOR') {
+      await prisma.vendor.create({
+        data: {
+          vendorId: user.id,//more data to be added as needed
+        },
+      });
+    } else if (role === 'ADMIN') {
+      await prisma.admin.create({
+        data: {
+          adminId: user.id,
+        },
+      });
+    }
+  } catch (error) {
+    // Optionally delete the user if creation fails to avoid orphaned records
+    await prisma.user.delete({ where: { id: user.id } });
+
+    throw new Error(`Failed to create ${role} profile: ${error.message}`);
+  }
 
   // Generate token
   const token = generateToken(user.id);
@@ -80,4 +102,6 @@ const login = async ({ email, password }) => {
   return { user: userData, token };
 };
 
+
 export { signup, login };
+

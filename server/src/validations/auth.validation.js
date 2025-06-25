@@ -36,7 +36,8 @@ const loginSchema = z.object({
 // Validation middleware adapter
 const validate = (schema) => (req, res, next) => {
   try {
-    schema.parse(req.body);
+    const parsed = schema.parse(req.body);
+    req.body = parsed; // If validation passes, replace req.body with the parsed data
     next();
   } catch (error) {
     const errors = error.errors.map((err) => ({

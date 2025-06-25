@@ -67,6 +67,7 @@ class ApiResponse {
       success: false,
       code,
       message: error.message || 'Internal Server Error',
+      details : error.details || null,
       stack: error.stack, // to be removed in production
     };
 
