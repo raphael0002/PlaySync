@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { createVenue, deleteVenue, getAllVenues, getVenueById, updateVenue } from "../controllers/venue.controller.js";
-import { validate, venueSchema, venueUpdateSchema } from "../validations/venue.validation.js";
+import { venueSchema, venueUpdateSchema } from "../validations/venue.validation.js";
 import isAuthenticated from "../middlewares/authenticate.middleware.js";
+import validate from "../validations/validate.js";
 
 const venueRoutes = Router();
 

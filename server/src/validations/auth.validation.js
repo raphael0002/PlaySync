@@ -12,7 +12,7 @@ const signupSchema = z.object({
   role: z.string() // normalize the input to uppercase and validate against allowed roles
     .min(1, 'Role is required')
     .transform((val) => val.toUpperCase())
-    .refine((val) => ['ADMIN','USER','VENDOR'].includes(val), {
+    .refine((val) => ['ADMIN', 'USER', 'VENDOR'].includes(val), {
       message: 'Role must be either ADMIN or USER or VENDOR',
     }),
 });
@@ -23,24 +23,4 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
-// Validation middleware adapter
-const validate = (schema) => (req, res, next) => {
-  try {
-    const parsed = schema.parse(req.body);
-    req.body = parsed; // If validation passes, replace req.body with the parsed data
-    next();
-  } catch (error) {
-
-    const errors = error.errors.map(err => ({ //errors inside error is an array of objects of error messages
-      field: err,
-      message: err.message,
-    }));
-
-    res.status(400).json({
-      success: false,
-      errors,
-    });
-  }
-};
-
-export { signupSchema, loginSchema, validate }
+export { signupSchema, loginSchema }

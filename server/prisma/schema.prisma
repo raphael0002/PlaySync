@@ -61,7 +61,7 @@ enum VenueStatus {
 
 model Venue {
   venue_id       String      @id @unique @default(uuid())
-  name           String      
+  name           String
   location       String
   sport_type     String
   description    String?
@@ -74,6 +74,28 @@ model Venue {
 
   partner    Vendor @relation(fields: [partner_id], references: [vendorId])
   partner_id String
+  Slot       Slot[]
 
   @@unique([name, location])
+}
+
+enum SlotStatus {
+  AVAILABLE
+  BOOKED
+  CANCELLED
+}
+
+model Slot {
+  slot_id    String     @id @default(uuid())
+  venue_id   String
+  start_time DateTime
+  end_time   DateTime
+  date       DateTime
+  status     SlotStatus @default(AVAILABLE)
+  price      Float
+
+  venue Venue @relation(fields: [venue_id], references: [venue_id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
