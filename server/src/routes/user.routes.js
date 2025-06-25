@@ -1,18 +1,24 @@
 import { Router } from "express";
+import multer from "multer";
 import {
   getAllUsers,
   getUser,
+  createUser,
   updateUser,
   deleteUser,
 } from "../controllers/user.controller.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 
+const upload = multer({ dest: "uploads/" });
 const userRoutes = Router();
 
-// Admin-only route to get all users
 userRoutes.get("/", authMiddleware(["ADMIN"]), getAllUsers);
-
-// Routes accessible to the user themselves or admin
+userRoutes.post(
+  "/",
+  authMiddleware(["ADMIN"]),
+  upload.single("profileImage"),
+  createUser
+);
 userRoutes.get(
   "/:id",
   authMiddleware(["USER", "ADMIN", "VENDOR"]),
@@ -21,6 +27,7 @@ userRoutes.get(
 userRoutes.patch(
   "/:id",
   authMiddleware(["USER", "ADMIN", "VENDOR"]),
+  upload.single("profileImage"),
   updateUser
 );
 userRoutes.delete(

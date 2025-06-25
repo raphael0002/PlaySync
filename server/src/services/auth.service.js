@@ -74,6 +74,7 @@ const login = async ({ email, password }) => {
     name: user.name,
     role: user.role,
     createdAt: user.createdAt,
+    profileImage: user.profileImage,
   };
 
   return { user: userData, token };
