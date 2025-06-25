@@ -1,72 +1,77 @@
+import { uploadImage } from "../services/image.service.js";
 import ApiResponse from "../utils/api-response.js";
-import * as  StatusCodes from '../utils/status-code.js';
-import * as userService from '../services/user.service.js';
+import { OK, CREATED } from "../utils/status-code.js";
+import * as StatusCodes from "../utils/status-code.js";
+import * as userService from "../services/user.service.js";
 
-const getAllUsers = async (req, res, next) => {
-
-    const users = await userService.getAllUsers();
-
-    ApiResponse.send(res, {
-        code: StatusCodes.OK,
-        message: "Users retrieved successfully",
-        data: { users }
-    });
+export const getAllUsers = async (req, res) => {
+  const users = await userService.getAllUsers();
+  ApiResponse.send(res, {
+    code: StatusCodes.OK,
+    message: "Users retrieved successfully",
+    data: { users },
+  });
 };
 
-const getUser = async (req, res, next) => {
-
-    const { id } = req.params;
-
-    try {
-        const user = await userService.getUserbyId(id);
-
-        ApiResponse.send(res, {
-            code: StatusCodes.OK,
-            message: "User retrieved successfully",
-            data: { user }
-        });
-    } catch (error) {
-        next(error);
-    }
-}
-
-const updateUser = async (req, res, next) => {
-
-    const { id } = req.params;
-
-    try {
-        const user = await userService.updateUserById(id, req.body);
-        if (!user) {
-            throw new Error('User not found');
-        }
-
-        ApiResponse.send(res, {
-            code: StatusCodes.OK,
-            message: "User Updated successfully",
-            data: { user }
-        });
-    } catch (error) {
-        next(error);
-    }
+export const getUser = async (req, res) => {
+  const { id } = req.params;
+  const user = await userService.getUserById(id);
+  ApiResponse.send(res, {
+    code: StatusCodes.OK,
+    message: "User retrieved successfully",
+    data: { user },
+  });
 };
 
-const deleteUser = async (req, res, next) => {
-    const { id } = req.params;
+export const createUser = async (req, res) => {
+  let profileImage = null;
+  if (req.file) {
+    const { url } = await uploadImage(
+      req.file,
+      "users",
+      `user_${Date.now()}`
+    );
+    profileImage = url;
+  }
+  const user = await userService.createUser({
+    ...req.body,
+    profileImage,
+  });
+  ApiResponse.send(res, {
+    code: CREATED,
+    message: "User created successfully",
+    data: { user },
+  });
+};
 
-    try {
-        const user = await userService.deleteUserById(id);
-        if (!user) {
-            throw new Error('User not found');
-        }
+export const updateUser = async (req, res) => {
+  const { id } = req.params;
+  let profileImage = req.body.profileImage || null;
+  if (req.file) {
+    const { url } = await uploadImage(
+      req.file,
+      "users",
+      `user_${id}_${Date.now()}`
+    );
+    profileImage = url;
+  }
+  const user = await userService.updateUserById(id, {
+    ...req.body,
+    profileImage,
+  });
+  ApiResponse.send(res, {
+    code: StatusCodes.OK,
+    message: "User updated successfully",
+    data: { user },
+  });
+};
 
-        ApiResponse.send(res, {
-            code: StatusCodes.OK,
-            message: "User deleted successfully",
-            data: { user }
-        });
-    } catch (error) {
-        next(error);
-    }
-}
-
-export { getAllUsers, getUser, updateUser, deleteUser };
+export const deleteUser = async (req, res) => {
+  const { id } = req.params;
+  const user = await userService.deleteUserById(id);
+  ApiResponse.send(res, {
+    code: StatusCodes.OK,
+    message: "User deleted successfully",
+    data: { user },
+  });
+};
